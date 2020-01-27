@@ -1,0 +1,14 @@
+kafka-streaming/dist/*
+kafka-streaming/target/
+kafka-streaming/lib_managed/
+kafka-streaming/src_managed/
+kafka-streaming/project/boot/
+kafka-streaming/project/plugins/project/
+kafka-streaming/.history
+kafka-streaming/.cache
+kafka-streaming/.lib/
+
+### Scala ###
+*.class
+*.log
+
