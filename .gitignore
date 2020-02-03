@@ -10,6 +10,21 @@ kafka-streaming/.cache
 kafka-streaming/.lib/
 kafka-streaming/.idea/
 
+
+SparkStreamingJob/dist/*
+SparkStreamingJob/target/
+SparkStreamingJob/lib_managed/
+SparkStreamingJob/src_managed/
+SparkStreamingJob/project/boot/
+SparkStreamingJob/project/target/
+SparkStreamingJob/project/plugins/project/
+SparkStreamingJob/.history
+SparkStreamingJob/.cache
+SparkStreamingJob/.lib/
+SparkStreamingJob/.idea/
+
+Notes/
+
 ### Scala ###
 *.class
 *.log
