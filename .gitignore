@@ -4,6 +4,7 @@ kafka-streaming/lib_managed/
 kafka-streaming/src_managed/
 kafka-streaming/project/boot/
 kafka-streaming/project/target/
+kafka-streaming/project/project/
 kafka-streaming/project/plugins/project/
 kafka-streaming/.history
 kafka-streaming/.cache
@@ -22,7 +23,7 @@ SparkStreamingJob/.history
 SparkStreamingJob/.cache
 SparkStreamingJob/.lib/
 SparkStreamingJob/.idea/
-
+SparkStreamingJob/metastore_db/*
 Notes/
 
 ### Scala ###
