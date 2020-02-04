@@ -1,4 +1,6 @@
 kafka-streaming/dist/*
+SparkStreamingJob/dist/*
+SparkStreamingJob/metastore_db/*
 kafka-streaming/target/
 kafka-streaming/lib_managed/
 kafka-streaming/src_managed/
@@ -12,8 +14,6 @@ kafka-streaming/.lib/
 kafka-streaming/.idea/
 
 
-SparkStreamingJob/dist/*
-SparkStreamingJob/metastore_db/*
 SparkStreamingJob/target/
 SparkStreamingJob/lib_managed/
 SparkStreamingJob/src_managed/
