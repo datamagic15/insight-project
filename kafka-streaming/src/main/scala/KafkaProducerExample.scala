@@ -9,6 +9,7 @@ object KafkaProducerExample {
     val envProps = conf.getConfig(args(0))
     // second arg filename to process
     val fileName = args(1)
+    println(fileName)
 
     val lineIter = io.Source.fromFile(fileName).getLines()
 
@@ -24,9 +25,12 @@ object KafkaProducerExample {
 
 
     val producer = new KafkaProducer[String, String](props)
+
     while (lineIter.hasNext) {
+      Thread.sleep(1)
       val msg = lineIter.next()
       val ipAddr = msg.split(",")(0)
+      println(msg)
       val record = new ProducerRecord[String, String]("edgar-logs" , ipAddr, msg)
       producer.send(record)
     }
