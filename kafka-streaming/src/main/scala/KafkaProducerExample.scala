@@ -27,10 +27,10 @@ object KafkaProducerExample {
     val producer = new KafkaProducer[String, String](props)
 
     while (lineIter.hasNext) {
-      Thread.sleep(1)
+      //Thread.sleep(1)
       val msg = lineIter.next()
       val ipAddr = msg.split(",")(0)
-      println(msg)
+      //println(msg)
       val record = new ProducerRecord[String, String]("edgar-logs" , ipAddr, msg)
       producer.send(record)
     }
