@@ -12,10 +12,12 @@ object SparkStreamingJob {
   def main(args: Array[String]): Unit = {
 
     val driver = "com.mysql.jdbc.Driver"
-    val url = "jdbc:mysql://ec2-44-226-132-64.us-west-2.compute.amazonaws.com:3306/edgar"
-    val table = "edgar_alerts"
+    val db_host = sys.env("MYSQL_HOST")
+    val edgar_db = sys.env("MYSQL_DB")
     val username = sys.env("MYSQL_USER")
     val password = sys.env("MYSQL_PWD")
+    val url = "jdbc:mysql://" + db_host + ":3306/" + edgar_db
+    val table = "edgar_alerts"
 
     val db_props = new Properties()
     db_props.setProperty("user", username)
@@ -25,10 +27,16 @@ object SparkStreamingJob {
     Class.forName(driver)
 
     val conf = ConfigFactory.load.getConfig(args(0))
+    val spark_master_node = sys.env("SPARK_MASTER")
+    val hdfs_path = "hdfs://" + spark_master_node + ":9000"
+    val spark_path = "spark://" + spark_master_node + ":7077"
+    val bootstrap_server = sys.env("BOOTSTRAP_SERVER")
+
+
     val spark = SparkSession.
       builder().
-      master(conf.getString("execution.mode")).
-      appName("Get Streaming Department Traffic").
+      master(spark_path).
+      appName("Edgar Alert Streaming Spark Job").
       getOrCreate()
 
     import spark.implicits._
@@ -37,7 +45,7 @@ object SparkStreamingJob {
 
     val lines = spark.readStream.
       format("kafka").
-      option("kafka.bootstrap.servers", conf.getString("bootstrap.servers")).
+      option("kafka.bootstrap.servers", bootstrap_server ).
       option("subscribe", "edgar-logs").
       option("includeTimestamp", true).
       load()
@@ -69,7 +77,7 @@ object SparkStreamingJob {
 
     logsDF.printSchema
     val staticSumsDF = spark.read
-      .parquet("hdfs://ec2-52-43-47-6.us-west-2.compute.amazonaws.com:9000/user/edgar/batch_results")
+      .parquet(hdfs_path + "/user/edgar/batch_results")
 
 
     val countsDF = logsDF.select($"event_time", $"cik" )
@@ -106,7 +114,7 @@ object SparkStreamingJob {
     val query = joinStaticAndStream.writeStream.
       foreachBatch{ (batchDF: DataFrame, batchId: Long) =>
         batchDF.write.mode("append").jdbc(url, table, db_props )
-        //parquet("hdfs://ec2-52-43-47-6.us-west-2.compute.amazonaws.com:9000/user/results")
+        //parquet(hdfs_path + "/user/results")
         //jdbc(url, table, db_props )
       }
       .trigger(Trigger.ProcessingTime("1 seconds"))
@@ -120,7 +128,7 @@ object SparkStreamingJob {
       .writeStream.
       foreachBatch{ (batchDF: DataFrame, batchId: Long) =>
         batchDF.write.mode("append").jdbc(url, table, db_props )
-          //parquet("hdfs://ec2-52-43-47-6.us-west-2.compute.amazonaws.com:9000/user/results")
+          //parquet(hdfs_path + "/user/results")
         //jdbc(url, table, db_props )
       }
       .outputMode("complete")
