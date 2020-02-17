@@ -46,7 +46,7 @@ def update_query(n):
         passwd = os.environ['MYSQL_PWD'],
         database = os.environ['MYSQL_DB']
     )
-    query1 = '''select c.ticker, a.* from edgar_alerts a join cik_ticker c on a.cik = c.cik
+    query1 = '''select c.ticker, a.* from edgar_alerts a left outer join cik_ticker c on a.cik = c.cik
     where a.end_time = ( select max(end_time) from edgar_alerts ) order by a.stream_count desc'''
 
     df_upd = pd.read_sql(query1, con = mydb)

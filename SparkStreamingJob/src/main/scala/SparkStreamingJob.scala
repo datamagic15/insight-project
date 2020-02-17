@@ -47,11 +47,12 @@ object SparkStreamingJob {
       format("kafka").
       option("kafka.bootstrap.servers", bootstrap_server ).
       option("subscribe", "edgar-logs").
-      option("includeTimestamp", true).
+      //option("includeTimestamp", true).
       load()
 
-    val kafkaLines = lines.selectExpr("CAST(value AS STRING)", "timestamp").
-      as[(String, Timestamp)]
+    val kafkaLines = lines.selectExpr("CAST(value AS STRING)").
+      as[(String)]
+
 
     val logsDF = kafkaLines.where(split($"value", ",")(0) =!= "ip").
       select(
@@ -71,16 +72,25 @@ object SparkStreamingJob {
         split($"value", ",")(4).cast("int").alias("norefer"),
         split($"value", ",")(4).cast("int").alias("noagent"),
         split($"value", ",")(4).cast("int").alias("find"),
-        split($"value", ",")(4).cast("int").alias("crawler"),
-        $"timestamp"
+        split($"value", ",")(4).cast("int").alias("crawler")
       )
 
-    logsDF.printSchema
+    // Many records contain garbage in the CIK field.  But in these cases we can derive the CIK
+    // from a substring of the accession column
+    val fixCikDF = logsDF.
+      withColumn("cik_new", when(length($"cik") > 9, substring($"accession",4,7)).
+      otherwise($"cik")).
+      drop("cik").
+      withColumnRenamed("cik_new","cik").
+      withColumn("cik", col("cik").cast("Integer"))
+
+    fixCikDF.printSchema
+
     val staticSumsDF = spark.read
       .parquet(hdfs_path + "/user/edgar/batch_results")
 
 
-    val countsDF = logsDF.select($"event_time", $"cik" )
+    val countsDF = fixCikDF.select($"event_time", $"cik" )
       .withWatermark("event_time", "30 seconds")
       .groupBy(
         window($"event_time", "300 seconds"),
@@ -101,9 +111,9 @@ object SparkStreamingJob {
       staticSumsDF.col("start_time"),
       staticSumsDF.col("end_time"),
       staticSumsDF.col("cik"),
-      staticSumsDF.col("avg_count"),
-      staticSumsDF.col("avg_count").multiply(4).alias("big_count")
-    ).filter( col("stream_count") > col("big_count") )
+      staticSumsDF.col("avg_cnt"),
+      staticSumsDF.col("avg_cnt").multiply(4).alias("big_cnt")
+    ).filter( col("stream_count") > col("big_cnt") )
 
     /*
     val query = joinStaticAndStream.writeStream
