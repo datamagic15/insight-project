@@ -11,6 +11,7 @@ import java.util.Properties
 object SparkStreamingJob {
   def main(args: Array[String]): Unit = {
 
+
     val driver = "com.mysql.jdbc.Driver"
     val db_host = sys.env("MYSQL_HOST")
     val edgar_db = sys.env("MYSQL_DB")
