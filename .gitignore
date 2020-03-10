@@ -1,5 +1,6 @@
 kafka-streaming/dist/*
 SparkStreamingJob/dist/*
+batch-data/dist/*
 SparkStreamingJob/metastore_db/*
 kafka-streaming/target/
 kafka-streaming/lib_managed/
@@ -24,6 +25,18 @@ SparkStreamingJob/.history
 SparkStreamingJob/.cache
 SparkStreamingJob/.lib/
 SparkStreamingJob/.idea/
+
+
+batch-data/target/
+batch-data/lib_managed/
+batch-data/src_managed/
+batch-data/project/boot/
+batch-data/project/target/
+batch-data/project/plugins/project/
+batch-data/.history
+batch-data/.cache
+batch-data/.lib/
+batch-data/.idea/
 Notes/
 
 ### Scala ###
